@@ -5,9 +5,17 @@ using UnityEngine.SceneManagement;
 
 public class CheckCollisions : MonoBehaviour
 {
-    public CollectCoin collectCoin;
+    
 	public PlayerController playerController;
 	public GameObject RestartPanel;
+	Vector3 PlayerStartPos;
+	public GameObject speedBoosterIcon;
+
+	private void Start()
+	{
+		PlayerStartPos = new Vector3(transform.position.x,transform.position.y,transform.position.z);
+		speedBoosterIcon.SetActive(false);
+	}
 
 	public void RestartGame()
 	{
@@ -16,29 +24,18 @@ public class CheckCollisions : MonoBehaviour
 
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.CompareTag("coin"))
-		{
-            collectCoin.AddCoin();
-            Destroy(other.gameObject);
-		}
+		
 		if (other.CompareTag("finish"))
 		{
-			if (collectCoin.score >= 54)
-			{
-				//Debug.Log("You Win!..");
-				playerController.runningSpeed = 0f;
-				playerController.PlayerAnim.SetBool("win", true);
-				transform.Rotate(transform.rotation.x, 180, transform.rotation.z, Space.Self);
-				RestartPanel.SetActive(true);
-			}
-			else
-			{
-				//Debug.Log("You Lose!..");
-				playerController.runningSpeed = 0f;
-				playerController.PlayerAnim.SetBool("lose", true);
-				transform.Rotate(transform.rotation.x, 180, transform.rotation.z, Space.Self);
-				RestartPanel.SetActive(true);
-			}
+			playerController.runningSpeed = 0f;
+			transform.Rotate(transform.rotation.x, 180, transform.rotation.z, Space.Self);
+			RestartPanel.SetActive(true);
+		}
+		if (other.CompareTag("speedboost"))
+		{
+			playerController.runningSpeed = playerController.runningSpeed + 3f;
+			speedBoosterIcon.SetActive(true);
+			StartCoroutine(SlowAfterAWhileCoroutine());
 		}
 	}
 
@@ -46,8 +43,16 @@ public class CheckCollisions : MonoBehaviour
 	{
 		if (collision.collider.CompareTag("obstacle"))
 		{
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+			//SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+			transform.position = PlayerStartPos;
 		}
+	}
+
+	private IEnumerator SlowAfterAWhileCoroutine()
+	{
+		yield return new WaitForSeconds(2.0f);
+		playerController.runningSpeed = playerController.runningSpeed - 3f;
+		speedBoosterIcon.SetActive(false);
 	}
 
 }
