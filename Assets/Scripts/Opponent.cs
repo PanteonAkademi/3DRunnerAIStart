@@ -23,6 +23,10 @@ public class Opponent : MonoBehaviour
     {
         //OpponentAgent.SetDestination(Target.transform.position);
         OpponentAgent.destination = Target.transform.position;
+		if (GameManager.instance.isGameOver )
+		{
+            OpponentAgent.Stop();
+		}
     }
 
 	private void OnCollisionEnter(Collision collision)
